@@ -333,6 +333,10 @@ ASALocalRun/
 # MFractors (Xamarin productivity tool) working folder
 .mfractor/
 
+# Config files need to be ignores in order to prevent leaks!
+*.ini
+*.cfg
+
 # Local History for Visual Studio
 .localhistory/
 
