@@ -10,9 +10,9 @@ namespace rLibrary.Services
     {
         private readonly IDatabaseService dbService;
 
-        public PublishService(IDatabaseService dbService)
+        public PublishService(IDataBaseProvider dbProvider)
         {
-            this.dbService = dbService;
+            this.dbService = dbProvider.currentDataBaseService;
         }
 
         public Task<rLibraryResponse<PublishedProfile>> Publish(PublishOnceDto publishOnce)

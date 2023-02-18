@@ -1,5 +1,7 @@
+using Microsoft.Extensions.Hosting;
 using rLibrary.Interfaces;
 using rLibrary.Services;
+using SharpConfig;
 
 namespace rLibrary
 {
@@ -16,10 +18,24 @@ namespace rLibrary
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
-            builder.Services.AddSingleton<IDatabaseService, DatabaseService>();
+            builder.Services.AddSingleton<CosmosDbService>();
+            builder.Services.AddSingleton<MongoDbService>();
+            builder.Services.AddSingleton<IDataBaseProvider, DataBaseProvider>();
             builder.Services.AddScoped<IPublishService, PublishService>();
 
             var app = builder.Build();
+
+            //Custom Initialization
+            using (var scope = app.Services.CreateScope())
+            {
+                var dbProvider = scope.ServiceProvider.GetRequiredService<IDataBaseProvider>();
+                var config = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+
+                string rConfigPath = config.GetValue<string>("ConfigurationPath");
+                Configuration rLibraryConfig = Configuration.LoadFromFile(rConfigPath);
+
+                dbProvider.LoadConfiguration(rLibraryConfig);
+            }
 
             // Configure the HTTP request pipeline.
             app.UseSwagger();

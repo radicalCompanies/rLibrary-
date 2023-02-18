@@ -1,33 +1,19 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Azure.Cosmos;
 using rLibrary.Entities.Enums;
+using rLibrary.Entities.Objects.DTOs.DbProvider;
 using rLibrary.Interfaces;
 
 namespace rLibrary.Services
 {
-    public class DatabaseService : IDatabaseService
+    public class CosmosDbService : IDatabaseService
     {
         private readonly string databaseName;
         private CosmosClient client;
 
-        public DatabaseService(IConfiguration configuration)
+        public virtual async Task Init(object parameters)
         {
-            string key = configuration.GetValue<string>("CosmosDb:Key");
-            string account = configuration.GetValue<string>("CosmosDb:Account");
-
-            client = new CosmosClient(account, key);
-            databaseName = configuration.GetValue<string>("CosmosDb:DatabaseName");
-
-            Init().GetAwaiter().GetResult();
-        }
-
-        public async Task Init()
-        {
-            DatabaseResponse database = await client.CreateDatabaseIfNotExistsAsync(databaseName);
-            foreach (string collection in Enum.GetNames(typeof(DataBaseCollections)))
-            {
-                await database.Database.CreateContainerIfNotExistsAsync(collection, "/id");
-            }
+            CosmosDbVars vars = (CosmosDbVars)parameters;
         }
 
         public async Task CreateCollection(DataBaseCollections collection)
